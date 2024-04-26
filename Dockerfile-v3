@@ -1,0 +1,44 @@
+# Use a imagem base
+# CONATEC
+# DockerFile montado para carregar aplicações dinamica um container docker.
+# 25/03/2024
+# Imagem de docker+flask
+#
+FROM ubuntu
+
+ARG SISTEMA
+ARG PORTA
+
+LABEL image.author="ramon.umleal@gmail.com"
+
+RUN apt-get update && \
+    apt-get install -y apache2 \
+    libapache2-mod-wsgi-py3 \
+    python3-pip \
+    python3.10-venv \
+    && apt-get clean \
+    && apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN echo "Listen $PORT" >> /etc/apache2/ports.conf
+
+COPY app/ /var/www/$SISTEMA/
+COPY app/$SISTEMA.conf /etc/apache2/sites-available/$SISTEMA.conf
+
+RUN if [ -f /var/www/conatec/env.example ]; then mv /var/www/conatec/env.example /var/www/conatec/.env; fi
+
+RUN mkdir -p /var/www/$SISTEMA/logs/ && \
+    chown -R www-data:www-data /var/www/$SISTEMA
+
+RUN a2enmod wsgi headers rewrite && \
+    a2dissite 000-default.conf && \
+    a2ensite $SISTEMA.conf
+
+WORKDIR /var/www/$SISTEMA
+RUN python3.10 -m venv venv && \
+    . venv/bin/activate && \
+    pip3 install -r requirements.txt
+
+EXPOSE $PORTA
+
+CMD ["apachectl", "-D", "FOREGROUND"]

@@ -1,0 +1,47 @@
+ comandos docker
+
+executaremos o comando para acessar o terminal em modo interativo
+#docker exec -it [imagen] bash
+
+Opçã -d libera o terminal, e -P configura as portas automaticamente docker e computador expoe as portas do docker
+#docker run -d -P dockersamples/static-site
+
+Lista as portas mais amigaves
+#docker port b0e93e405db6
+
+Desejamos que a porta 8080 da nossa máquina reflita na porta 80 do container. Para isso, após o -p inserimos 8080:80
+#docker run -d -p 8080:80 dockersamples/static-site
+
+Parar todos os docker que estão listadas.
+#docker stop $(docker container ls -q)
+
+Caso tenhamos imagens ainda, vamos removê-las
+#docker rmi $(docker image ls -aq)
+#docker rmi $(docker image ls -aq) --force
+
+
+Esse apaga tudo de tudo 
+docker system prune
+
+Queremos que esse diretório, cujo caminho é /home/ramon/volume-docker
+docker run -it -v /home/ramon/volume-docker:/app ubuntu bash
+
+
+Criar imagen da CONATEC
+docker run -it --name conatec python:3.10.12-slim /bin/bash
+
+
+Para construir a imagem, você pode usar o comando docker build.
+docker build -t conatec-imagem:latest .
+
+
+Depois de criar a imagem, você pode executar um contêiner a partir dela usando o comando docker run.
+
+docker run -d -p 8080:80 conatec-imagem:latest
+ #especionar 
+ docker inspect ID
+ 
+ 
+ # verificar log do docker
+ docker logs -f ID
+
